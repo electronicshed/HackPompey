@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>Untitled</title>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+    <!-- Open mapping -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>      
+
+    <script type="text/javascript">
+
+  /*-----------------------------
+  * readXMLFile
+  *-----------------------------*/
+  
+  var moredata;
+  var currentboundary = 1017016; 
+  var polygon;
+
+  
+   function ReadJSONFile(layerno){
+
+    if (polygon){
+      map.removeLayer(polygon);
+      }
+   
+    filename = "http://data.hampshirehub.net/boundaries/E0" + layerno + ".json";
+     if (window.XMLHttpRequest)
+     {// code for IE7+, Firefox, Chrome, Opera, Safari
+       xmlhttp=new XMLHttpRequest();
+     }
+     else
+     {// code for IE6, IE5
+       xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+     }
+     xmlhttp.open("GET",filename, false);
+     xmlhttp.send();
+     var xmlDoc=xmlhttp.responseText; 
+   
+     obj = JSON.parse(xmlDoc);
+   
+     var Data = obj.geometry.coordinates;
+     moredata = Data[0];
+     length = moredata.length;
+   
+     for(j=0; j<length; j++){  
+         lati=  moredata[j][1];
+         longi= moredata[j][0];
+        
+         moredata[j][1] = longi;
+         moredata[j][0] = lati;    
+     }
+   
+      polygon = L.polygon(moredata
+      ).addTo(map);
+      
+     
+   }/* End ReadXMLFiletemp */
+   
+   function next(){
+    currentboundary++;
+    ReadJSONFile(currentboundary);
+   }
+   
+   function previous(){
+    currentboundary--;
+    ReadJSONFile(currentboundary);
+   }
+
+</script>
+
+<style>
+
+#map { height: 780px; }
+
+</style>
+
+</head>
+<body onload="ReadJSONFile()">
+
+  <button type="button" onclick="previous()">Previous Boundary</button>   
+
+  <button type="button" onclick="next()">Next Boundary</button>
+     
+  <div id="map"></div>
+  
+ 
+  <script type="text/javascript">
+       
+		map = L.map('map').setView([50.8094388,-1.0584071], 15);
+
+		L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'examples.map-i875mjb7'
+		}).addTo(map);    
+    
+  </script>
+</body>
+</html>
